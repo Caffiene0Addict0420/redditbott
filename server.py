@@ -2,6 +2,9 @@ from ezy_multiplayer import *
 import pickle, os, praw, time, traceback
 from thread import start_new_thread
 
+def log(to_log):
+    print("-Log: " + to_log + "-")
+
 def load_settings():
     try:
         if os.name == "nt":
@@ -10,6 +13,7 @@ def load_settings():
             return pickle.load(open("/root/settings.data", "rb"))
     except Exception as e:
         return "False"
+        log("ERROR reading settings.data")
 
 def send_msg(reddit, user, title, message):
     reddit.redditor(user).message(title, message)
@@ -22,7 +26,7 @@ def save_settings(everything):
             pickle.dump(everything, open("/root/settings.data", "wb"))
         return "True"
     except Exception as e:
-        print(e)
+        log("ERROR saving settings.data")
         return "False"
 
 def send_back(data):
@@ -50,8 +54,9 @@ def reddit_logic():
                              user_agent='Python AUTOJOBFINDER Bot',
                              username = settings[0],
                              password = settings[1])
+            log("Successful Login")
         except Exception as e:
-            print("-Error-")
+            log("ERROR logging in")
             time.sleep(5)
             continue
         try:
@@ -59,7 +64,9 @@ def reddit_logic():
                 all_id = pickle.load(open("redditid.data", "rb"))
             else:
                 all_id = pickle.load(open("/root/redditid.data", "rb"))
-        except:all_id = []
+        except:
+            all_id = []
+            log("ERROR reading redditid.data")
         try:
             for submission in reddit.subreddit(settings[4]).new(limit=100):
                 if submission.id not in all_id:
@@ -83,6 +90,8 @@ def reddit_logic():
                                 if "*un*" in message:
                                     message = message.replace("*un*", str(submission.author.name))
                                 send_msg(reddit, submission.author.name, settings[7], message) ##############
+                                log("SENT_MSG " + submission.url)
+            log("SLEEP 60")
             time.sleep(60)
         except KeyboardInterrupt:
             print("Stopping...")
