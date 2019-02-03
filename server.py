@@ -107,10 +107,11 @@ def reddit_logic():
             
         save_id(all_id)
 
-if os.name == "nt":
-    port = get_free_port()
-else:
-    port = 8080
+#if os.name == "nt":
+#    port = get_free_port()
+#else:
+#    port = 8080
+port = get_free_port()
 
 print("Local  Hostname: " + get_ip())
 print("Global Hostname: " + get_ip("global"))
